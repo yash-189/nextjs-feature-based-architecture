@@ -50,8 +50,9 @@ shared     → lib, theme
 lib        → theme
 ```
 
-Biome checks the two that matter most: no importing another feature's
-internals, and ui/lib/shared never import from features. Inside a feature,
+Biome checks the ones that matter most: no importing another feature's
+internals, ui/lib/shared never import from features, and `sonner` is only
+imported by `lib/toast.ts`. Inside a feature,
 import files directly.
 
 ## Mock backend
@@ -79,6 +80,7 @@ when the server restarts. Tests reuse the same handlers with `setupServer`.
 | Session cookies | `lib/session.ts`, names in `lib/cookies.ts` |
 | Mock endpoints and demo data | `mocks/handlers/`, `mocks/data/` |
 | Env variables | `lib/env.ts` (nothing else reads `process.env`) |
+| Toasts | `lib/toast.ts` |
 | App name | `lib/site.ts` |
 | Colors and type | `theme/` |
 
@@ -131,6 +133,33 @@ No hardcoded paths, env reads or colors anywhere else.
 - Named exports, except Next's route files.
 - Tests go next to the file they test. Render components that use queries
   with `renderWithProviders` from `src/test/render.tsx`.
+
+## Principles
+
+- **Single source of truth.** Each rule lives in one function, used
+  everywhere. Never write the same logic twice; two copies drift apart.
+- **Data stays data.** Never write UI text into data (e.g. `name: "Deleted
+  customer"`). Store the fact (`deletedAt`) and let the UI render the label.
+- **One job per piece.** Components render. Formatting, filtering and
+  parsing live in pure functions (`filters.ts`, `utils/`), tested once.
+- **Keep it readable.** No `let x = ""` followed by if/else reassignment;
+  use a small function with early returns or a lookup object. At most one
+  level of ternary.
+- **Strings.** User-facing text used in 2+ places, or that carries meaning
+  (errors, statuses), goes in the feature's `constants.ts`. One-off labels
+  can stay inline in JSX.
+- **Vendor boundaries.** Code depends on our interface, not the library's:
+  - backend → `features/<x>/api.ts`
+  - toasts → `lib/toast.ts` (typed `success` / `error` only)
+
+  Swapping a library changes one file. Biome blocks importing `sonner`
+  directly. Don't wrap a library just to pass calls through; a wrapper
+  should narrow the API or add behaviour.
+- **Browser APIs** (clipboard, storage) go behind a small hook, not inline
+  in components. It lives in the feature until a second feature needs it,
+  then moves to `shared/hooks`.
+- **Tailwind:** use scale classes (`min-h-4.5`, not `min-h-[1.125rem]`), no
+  redundant classes, no hardcoded colors.
 
 ## Keep it simple
 

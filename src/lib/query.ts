@@ -1,7 +1,7 @@
 import { isServer, MutationCache, QueryClient } from "@tanstack/react-query";
 import { cache } from "react";
-import { toast } from "sonner";
 import { ApiError } from "./http/errors";
+import { toast } from "./toast";
 
 const STALE_MS = 60_000;
 

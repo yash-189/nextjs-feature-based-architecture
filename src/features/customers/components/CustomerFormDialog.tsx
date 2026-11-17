@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { ApiError } from "@/lib/http";
+import { toast } from "@/lib/toast";
 import { Button } from "@/ui/primitives/button";
 import {
   Dialog,
