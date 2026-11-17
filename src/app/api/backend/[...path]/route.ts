@@ -1,4 +1,5 @@
 import { env } from "@/lib/env";
+import { Endpoints } from "@/lib/http";
 import { getAccessToken } from "@/lib/session";
 
 // Browser requests to the backend go through here so the token can stay in
@@ -24,6 +25,13 @@ const DROPPED_RESPONSE_HEADERS = [
   "transfer-encoding",
 ];
 
+// These return raw tokens. Only the server may call them, so the tokens go
+// straight into httpOnly cookies and never reach the browser.
+const SERVER_ONLY_ENDPOINTS = new Set<string>([
+  Endpoints.auth.login,
+  Endpoints.auth.refresh,
+]);
+
 function backendUrl(path: string[], search: string) {
   const safePath = path.map(encodeURIComponent).join("/");
   return `${env.API_URL}/${safePath}${search}`;
@@ -31,6 +39,9 @@ function backendUrl(path: string[], search: string) {
 
 async function handle(request: Request, { params }: Context) {
   const { path } = await params;
+  if (SERVER_ONLY_ENDPOINTS.has(`/${path.join("/")}`)) {
+    return new Response(null, { status: 404 });
+  }
 
   const headers = new Headers();
   for (const name of FORWARDED_REQUEST_HEADERS) {
