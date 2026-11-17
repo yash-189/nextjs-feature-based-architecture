@@ -37,6 +37,19 @@
               "sonner": "Import toast from @/lib/toast so the library stays swappable."
             }
           }
+        },
+        "noNestedTernary": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "error",
+          "fix": "safe",
+          "options": {
+            "functions": ["cn", "cva"]
+          }
         }
       }
     },
@@ -114,6 +127,15 @@
         "rules": {
           "a11y": {
             "noLabelWithoutControl": "off"
+          },
+          "style": {
+            "noNestedTernary": "off"
+          },
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          },
+          "nursery": {
+            "useSortedClasses": "off"
           }
         }
       }
