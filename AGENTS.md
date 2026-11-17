@@ -111,7 +111,8 @@ No hardcoded paths, env reads or colors anywhere else.
 - Every screen that loads data handles loading, error, empty and content.
 - Add `import "server-only"` to anything that reads cookies or secrets.
 - Named exports, except Next's route files.
-- Tests go next to the file they test.
+- Tests go next to the file they test. Render components that use queries
+  with `renderWithProviders` from `src/test/render.tsx`.
 
 ## Keep it simple
 
@@ -123,4 +124,5 @@ Delete experiments once you've picked one. Comments explain why, not what.
 
 ```
 npm run check   typecheck and lint
+npm test        unit and component tests
 ```
