@@ -18,8 +18,8 @@ file and the code disagree, trust the code and update this file.
 ```
 src/
   app/          routes only, no logic
-  features/<x>/ components/, hooks/, api.ts, queries.ts, schemas.ts, types.ts,
-                constants.ts, index.ts
+  features/<x>/ components/, hooks/, utils/, api.ts, queries.ts, schemas.ts,
+                types.ts, constants.ts, index.ts
   ui/           primitives/ (shadcn) and components/{feedback,layout,navigation,theme}
   shared/       hooks/ and utils/ used by 2+ features, no business logic
   lib/          http/, session, env, query, routes, cookies, site
@@ -30,6 +30,10 @@ src/
   proxy.ts      redirects signed-out users (Next 16's middleware)
 ```
 
+`features/customers` (small) and `features/orders` (grown) are samples.
+Copy `customers` to start a feature, and delete both when starting a real
+project. See `docs/architecture.md` for the reasoning behind these rules.
+
 A feature starts with flat files. A file becomes a folder (`api/`, `types/`,
 `schemas/`, `queries/`) once it holds two or more resources or passes about
 300 lines; files inside use a suffix, like `orders.api.ts`. A feature that
@@ -38,7 +42,7 @@ keeps growing is split into two features rather than nested deeper.
 ## Imports
 
 ```
-app        → providers, features, ui, shared, lib, theme
+app        → providers, features, ui, shared, lib, theme, mocks
 providers  → lib, theme
 features   → ui, shared, lib   (other features only through their index.ts)
 ui         → shared, lib, theme
@@ -58,7 +62,7 @@ run for real. Nothing patches `fetch`, so it behaves the same in dev, in a
 production build and in a deployment. The app has
 no mock-specific code paths: turn it off and point `API_URL` at a real
 backend. Features never import `mocks/`; add a handler there for each new
-endpoint, mirroring the real API's envelope. The data is in memory and resets
+endpoint, mirroring the real API's envelope. Only `app/` imports it. The data is in memory and resets
 when the server restarts. Tests reuse the same handlers with `setupServer`.
 
 ## Where things live
