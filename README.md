@@ -61,29 +61,110 @@ port, update `API_URL` to match.
 
 ```
 src/
-  app/          routes only: pages, layouts, route handlers
-  features/     one folder per business feature
-    auth/         sign-in and sign-out
-    customers/    sample: a small feature with flat files
-    orders/       sample: the same rules after the feature grew
-  ui/           primitives/ (shadcn) and shared components/
-  shared/       hooks and utils used by two or more features
-  lib/          HTTP client, session, env, routes, query client
-  mocks/        mock backend: handlers, demo data, in-memory db
-  providers/    React Query, theme and toasts
-  theme/        design tokens
-  test/         test setup and helpers
+  app/                      routes only: pages, layouts, route handlers
+    (marketing)/              public landing page
+    (auth)/login/             sign-in page
+    (app)/                    signed-in area: layout, error.tsx, loading.tsx
+      customers/  orders/  orders/[id]/  dashboard/
+    api/backend/[...path]/    BFF proxy: adds the token from the cookie
+    api/auth/refresh/         refreshes the session cookie
+    api/mock/[...path]/       mock backend (when API_MOCKING=enabled)
+    not-found.tsx  global-error.tsx
+  features/
+    auth/                     login/logout server actions, LoginForm
+    customers/                small feature, flat files
+      components/  hooks/
+      api.ts  queries.ts  schemas.ts  types.ts  filters.ts  constants.ts
+      index.ts                public API, the only file others import
+    orders/                   grown feature, files became folders
+      api/       orders.api.ts  payments.api.ts
+      queries/   keys.ts  orders.queries.ts  payments.queries.ts
+      types/     order.types.ts  payment.types.ts
+      components/  hooks/  utils/  constants.ts  index.ts
+  ui/
+    primitives/               shadcn (Base UI): button, dialog, select, table…
+    components/               shared, feature-agnostic components
+      feedback/                 EmptyState, ErrorState
+      navigation/               Pagination
+      layout/                   NavLink
+      theme/                    ThemeToggle
+  shared/
+    hooks/                    useDebouncedValue
+    utils/                    formatDate
+  lib/
+    http/                     axios clients (server + browser), errors,
+                              endpoints, envelope unwrapping, params
+    session.ts  cookies.ts    httpOnly token cookies
+    env.ts                    zod-validated environment
+    routes.ts  site.ts  query.ts  utils.ts
+  mocks/                      MSW handlers, demo data, in-memory db
+  providers/                  React Query, theme and toasts
+  theme/                      design tokens (globals.css)
+  test/                       Vitest setup and renderWithProviders
+  proxy.ts                    redirects signed-out users to /login
 ```
 
-Imports only point one way:
+### Import rules
 
-```
-app → features → ui / shared → lib
-```
+| Layer | Can import |
+|---|---|
+| `app` | everything |
+| `features` | `ui`, `shared`, `lib`, and other features **only via their `index.ts`** |
+| `ui` | `shared`, `lib`, `theme` |
+| `shared` | `lib`, `theme` |
+| `lib` | `theme` |
+
+Biome (`noRestrictedImports`) fails the build when a rule is broken, so the
+boundaries hold as the team grows.
 
 See [docs/architecture.md](docs/architecture.md) for the layers, the
 request and auth flow, how a feature grows, and the trade-offs behind each
 decision.
+
+## What's included
+
+**Shared UI** (`src/ui/components`)
+
+| Component | Use |
+|---|---|
+| `EmptyState` | no-results / first-use screens with an optional action |
+| `ErrorState` | failed queries, with a retry button |
+| `Pagination` | generic page controls driven by the URL (`itemLabel` prop) |
+| `NavLink` | nav link with active state |
+| `ThemeToggle` | switches light and dark |
+
+A component moves here only when a second feature needs it.
+
+**Data patterns** (see `customers` and `orders`)
+
+- Server prefetch + `HydrationBoundary`, same `queryOptions` on the client
+- Filters, search and page in the URL, debounced search
+- Create / edit / delete dialogs with React Hook Form + Zod, field errors
+  from the API mapped onto the form
+- Optimistic status update with rollback (`useUpdateOrderStatus`)
+- `keepPreviousData` paging, skeletons, empty and error states on every screen
+
+**HTTP and auth** (`src/lib/http`, `src/lib/session.ts`)
+
+- `serverHttp` for server code, `clientHttp` for the browser through the proxy
+- Tokens only in httpOnly cookies; refresh once on 401, shared by parallel
+  requests; revoked sessions go straight to login
+- Typed `ApiError` with status, code and field errors
+- Proxy forwards an allow-list of headers, times out after 15s, and blocks
+  token endpoints from the browser
+
+**App shell**
+
+- `error.tsx`, `loading.tsx`, `not-found.tsx`, `global-error.tsx`
+- Security headers and `poweredByHeader: false` in `next.config.ts`
+- Route guard in `proxy.ts`
+
+**Quality**
+
+- Vitest + Testing Library tests beside the code (HTTP client refresh,
+  mock handlers, parsers, components)
+- Pre-commit Biome via husky + lint-staged, Node pinned in `.nvmrc`
+- CI on every PR: lint, typecheck, test, build; Dependabot updates
 
 ## Adding a feature
 
