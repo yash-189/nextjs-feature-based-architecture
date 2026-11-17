@@ -4,12 +4,12 @@ import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { EmptyState } from "@/ui/components/feedback/EmptyState";
 import { ErrorState } from "@/ui/components/feedback/ErrorState";
+import { Pagination } from "@/ui/components/navigation/Pagination";
 import { Button } from "@/ui/primitives/button";
 import { useCustomerFilters } from "../hooks/useCustomerFilters";
 import { useCustomers } from "../hooks/useCustomers";
 import type { Customer } from "../types";
 import { CustomerFormDialog } from "./CustomerFormDialog";
-import { CustomerPagination } from "./CustomerPagination";
 import { CustomerTable, CustomerTableSkeleton } from "./CustomerTable";
 import { CustomerToolbar } from "./CustomerToolbar";
 import { DeleteCustomerDialog } from "./DeleteCustomerDialog";
@@ -77,11 +77,12 @@ export function CustomersScreen() {
             onEdit={(customer) => setForm({ open: true, customer })}
             onDelete={setDeleting}
           />
-          <CustomerPagination
+          <Pagination
             page={data.page}
             totalPages={data.totalPages}
             totalCount={data.totalCount}
             onPageChange={(page) => setFilters({ ...filters, page })}
+            itemLabel={{ one: "customer", other: "customers" }}
           />
         </>
       )}

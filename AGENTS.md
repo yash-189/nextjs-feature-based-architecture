@@ -20,7 +20,7 @@ src/
   app/          routes only, no logic
   features/<x>/ components/, hooks/, api.ts, queries.ts, schemas.ts, types.ts,
                 constants.ts, index.ts
-  ui/           primitives/ (shadcn) and components/{feedback,layout,theme}
+  ui/           primitives/ (shadcn) and components/{feedback,layout,navigation,theme}
   shared/       hooks/ and utils/ used by 2+ features, no business logic
   lib/          http/, session, env, query, routes, cookies, site
   providers/    React Query, theme, toasts (only app/ imports this)

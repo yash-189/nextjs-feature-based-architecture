@@ -1,26 +1,28 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/ui/primitives/button";
 
-interface CustomerPaginationProps {
+interface PaginationProps {
   page: number;
   totalPages: number;
   totalCount: number;
   onPageChange: (page: number) => void;
+  itemLabel: { one: string; other: string };
 }
 
-export function CustomerPagination({
+export function Pagination({
   page,
   totalPages,
   totalCount,
   onPageChange,
-}: CustomerPaginationProps) {
+  itemLabel,
+}: PaginationProps) {
   return (
     <nav
       aria-label="Pagination"
       className="flex items-center justify-between gap-2 text-muted-foreground text-sm"
     >
       <span>
-        {totalCount} {totalCount === 1 ? "customer" : "customers"}
+        {totalCount} {totalCount === 1 ? itemLabel.one : itemLabel.other}
       </span>
       <div className="flex items-center gap-2">
         <span>
