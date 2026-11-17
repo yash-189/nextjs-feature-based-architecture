@@ -17,6 +17,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <nav className="flex items-center gap-1">
             <NavLink href={Routes.dashboard}>Dashboard</NavLink>
             <NavLink href={Routes.customers}>Customers</NavLink>
+            <NavLink href={Routes.orders}>Orders</NavLink>
           </nav>
         </div>
         <div className="flex items-center gap-1">

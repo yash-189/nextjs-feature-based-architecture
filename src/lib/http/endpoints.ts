@@ -8,4 +8,9 @@ export const Endpoints = {
     list: "/customers",
     one: (id: string) => `/customers/${encodeURIComponent(id)}`,
   },
+  orders: {
+    list: "/orders",
+    one: (id: string) => `/orders/${encodeURIComponent(id)}`,
+    payments: (id: string) => `/orders/${encodeURIComponent(id)}/payments`,
+  },
 } as const;

@@ -3,6 +3,8 @@ export const Routes = {
   login: "/login",
   dashboard: "/dashboard",
   customers: "/customers",
+  orders: "/orders",
+  order: (id: string) => `/orders/${encodeURIComponent(id)}`,
   // Must match the app/api/backend folder.
   backendApi: "/api/backend",
   authRefresh: "/api/auth/refresh",
@@ -10,4 +12,8 @@ export const Routes = {
   mockApi: "/api/mock",
 } as const;
 
-export const SIGNED_IN_ROUTES = [Routes.dashboard, Routes.customers] as const;
+export const SIGNED_IN_ROUTES = [
+  Routes.dashboard,
+  Routes.customers,
+  Routes.orders,
+] as const;
