@@ -27,7 +27,6 @@ const STATUS_ITEMS = ORDER_STATUSES.map((status) => ({
 
 export function OrderDetailScreen({ id }: { id: string }) {
   const order = useOrder(id);
-  const payments = useOrderPayments(id);
   const updateStatus = useUpdateOrderStatus(id);
 
   if (order.isPending) return <Skeleton className="h-64 w-full" />;
@@ -83,31 +82,39 @@ export function OrderDetailScreen({ id }: { id: string }) {
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Payments</h2>
-        {payments.isPending ? (
-          <Skeleton className="h-16 w-full" />
-        ) : payments.isError ? (
-          <ErrorState
-            title="Couldn't load payments"
-            onRetry={() => payments.refetch()}
-          />
-        ) : payments.data.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No payments yet.</p>
-        ) : (
-          <ul className="divide-y rounded-lg border">
-            {payments.data.map((payment) => (
-              <li key={payment.id} className="flex justify-between p-3 text-sm">
-                <span>
-                  {payment.method === "card" ? "Card" : "Bank transfer"} ·{" "}
-                  {formatDate(payment.createdAt)}
-                </span>
-                <span className="tabular-nums">
-                  {formatMoney(payment.amount)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <OrderPayments orderId={id} />
       </section>
     </div>
+  );
+}
+
+function OrderPayments({ orderId }: { orderId: string }) {
+  const payments = useOrderPayments(orderId);
+
+  if (payments.isPending) return <Skeleton className="h-16 w-full" />;
+  if (payments.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load payments"
+        onRetry={() => payments.refetch()}
+      />
+    );
+  }
+  if (payments.data.length === 0) {
+    return <p className="text-muted-foreground text-sm">No payments yet.</p>;
+  }
+
+  return (
+    <ul className="divide-y rounded-lg border">
+      {payments.data.map((payment) => (
+        <li key={payment.id} className="flex justify-between p-3 text-sm">
+          <span>
+            {payment.method === "card" ? "Card" : "Bank transfer"} ·{" "}
+            {formatDate(payment.createdAt)}
+          </span>
+          <span className="tabular-nums">{formatMoney(payment.amount)}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

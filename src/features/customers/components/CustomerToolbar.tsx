@@ -37,7 +37,7 @@ export function CustomerToolbar({ filters, onChange }: CustomerToolbarProps) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
       <div className="relative flex-1">
-        <SearchIcon className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground" />
+        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
           value={search}

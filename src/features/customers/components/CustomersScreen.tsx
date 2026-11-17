@@ -8,21 +8,25 @@ import { Pagination } from "@/ui/components/navigation/Pagination";
 import { Button } from "@/ui/primitives/button";
 import { useCustomerFilters } from "../hooks/useCustomerFilters";
 import { useCustomers } from "../hooks/useCustomers";
-import type { Customer } from "../types";
+import type { Customer, CustomerFilters } from "../types";
 import { CustomerFormDialog } from "./CustomerFormDialog";
 import { CustomerTable, CustomerTableSkeleton } from "./CustomerTable";
 import { CustomerToolbar } from "./CustomerToolbar";
 import { DeleteCustomerDialog } from "./DeleteCustomerDialog";
 
+interface CustomersContentProps {
+  filters: CustomerFilters;
+  onFiltersChange: (changes: Partial<CustomerFilters>) => void;
+  onEdit: (customer: Customer) => void;
+  onDelete: (customer: Customer) => void;
+}
+
 type FormState = { open: false } | { open: true; customer?: Customer };
 
 export function CustomersScreen() {
   const { filters, setFilters } = useCustomerFilters();
-  const { data, isPending, isError, refetch } = useCustomers(filters);
   const [form, setForm] = useState<FormState>({ open: false });
   const [deleting, setDeleting] = useState<Customer>();
-
-  const hasFilters = filters.search !== "" || filters.status !== "all";
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,51 +45,12 @@ export function CustomersScreen() {
 
       <CustomerToolbar filters={filters} onChange={setFilters} />
 
-      {isPending ? (
-        <CustomerTableSkeleton />
-      ) : isError ? (
-        <ErrorState
-          title="Couldn't load customers"
-          description="Check your connection and try again."
-          onRetry={() => refetch()}
-        />
-      ) : data.items.length === 0 ? (
-        hasFilters ? (
-          <EmptyState
-            title="No matching customers"
-            description="Try a different search or status."
-            action={
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setFilters({ search: "", status: "all" })}
-              >
-                Clear filters
-              </Button>
-            }
-          />
-        ) : (
-          <EmptyState
-            title="No customers yet"
-            description="Add your first customer to get started."
-          />
-        )
-      ) : (
-        <>
-          <CustomerTable
-            customers={data.items}
-            onEdit={(customer) => setForm({ open: true, customer })}
-            onDelete={setDeleting}
-          />
-          <Pagination
-            page={data.page}
-            totalPages={data.totalPages}
-            totalCount={data.totalCount}
-            onPageChange={(page) => setFilters({ ...filters, page })}
-            itemLabel={{ one: "customer", other: "customers" }}
-          />
-        </>
-      )}
+      <CustomersContent
+        filters={filters}
+        onFiltersChange={setFilters}
+        onEdit={(customer) => setForm({ open: true, customer })}
+        onDelete={setDeleting}
+      />
 
       <CustomerFormDialog
         open={form.open}
@@ -101,5 +66,69 @@ export function CustomersScreen() {
         }}
       />
     </div>
+  );
+}
+
+function CustomersContent({
+  filters,
+  onFiltersChange,
+  onEdit,
+  onDelete,
+}: CustomersContentProps) {
+  const { data, isPending, isError, refetch } = useCustomers(filters);
+
+  if (isPending) return <CustomerTableSkeleton />;
+  if (isError) {
+    return (
+      <ErrorState
+        title="Couldn't load customers"
+        description="Check your connection and try again."
+        onRetry={() => refetch()}
+      />
+    );
+  }
+
+  if (data.items.length === 0) {
+    const hasFilters = filters.search !== "" || filters.status !== "all";
+    if (!hasFilters) {
+      return (
+        <EmptyState
+          title="No customers yet"
+          description="Add your first customer to get started."
+        />
+      );
+    }
+    return (
+      <EmptyState
+        title="No matching customers"
+        description="Try a different search or status."
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onFiltersChange({ search: "", status: "all" })}
+          >
+            Clear filters
+          </Button>
+        }
+      />
+    );
+  }
+
+  return (
+    <>
+      <CustomerTable
+        customers={data.items}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+      <Pagination
+        page={data.page}
+        totalPages={data.totalPages}
+        totalCount={data.totalCount}
+        onPageChange={(page) => onFiltersChange({ page })}
+        itemLabel={{ one: "customer", other: "customers" }}
+      />
+    </>
   );
 }

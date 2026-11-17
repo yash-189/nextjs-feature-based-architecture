@@ -144,7 +144,10 @@ No hardcoded paths, env reads or colors anywhere else.
   parsing live in pure functions (`filters.ts`, `utils/`), tested once.
 - **Keep it readable.** No `let x = ""` followed by if/else reassignment;
   use a small function with early returns or a lookup object. At most one
-  level of ternary.
+  level of ternary. Screens with loading / error / empty / content states
+  use a component with early returns in that order. Biome enforces this
+  (`noNestedTernary`, `noExcessiveCognitiveComplexity`) and sorts Tailwind
+  classes, including inside `cn()`.
 - **Strings.** User-facing text used in 2+ places, or that carries meaning
   (errors, statuses), goes in the feature's `constants.ts`. One-off labels
   can stay inline in JSX.
