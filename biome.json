@@ -51,6 +51,30 @@
   },
   "overrides": [
     {
+      "includes": ["src/features/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/features/*/*"],
+                    "message": "Import another feature through its index.ts (@/features/<name>), not its internals."
+                  },
+                  {
+                    "group": ["@/mocks/**"],
+                    "message": "Features reach the mock backend over HTTP like a real API, never by import."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/ui/**", "src/lib/**", "src/shared/**", "src/theme/**"],
       "linter": {
         "rules": {
@@ -60,7 +84,12 @@
               "options": {
                 "patterns": [
                   {
-                    "group": ["@/features/**", "@/providers/**", "@/app/**"],
+                    "group": [
+                      "@/features/**",
+                      "@/providers/**",
+                      "@/app/**",
+                      "@/mocks/**"
+                    ],
                     "message": "ui/, lib/ and shared/ sit below features and must not import them."
                   }
                 ]

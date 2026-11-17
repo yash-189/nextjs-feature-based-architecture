@@ -6,15 +6,20 @@ feature with enforced module boundaries.
 ## Stack
 
 Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui ·
-TanStack Query · React Hook Form + Zod · Axios · Biome · Vitest · Testing Library
+TanStack Query · React Hook Form + Zod · Axios · Biome · Vitest · Testing Library · MSW
 
 ## Getting started
 
 ```bash
-cp .env.example .env.local   # set API_URL to your backend
+cp .env.example .env.local
 npm install
 npm run dev
 ```
+
+The app runs without a backend: `.env.example` turns on the mock backend
+(MSW), so you can sign in with **demo@example.com / password**. To use a real
+API, set `API_URL` and `API_MOCKING=disabled` in `.env.local`. If you run the
+dev server on another port, update `API_URL` to match.
 
 ## Scripts
 

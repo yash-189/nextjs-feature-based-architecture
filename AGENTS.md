@@ -25,6 +25,8 @@ src/
   lib/          http/, session, env, query, routes, cookies, site
   providers/    React Query, theme, toasts (only app/ imports this)
   theme/        design tokens
+  mocks/        MSW mock backend: handlers/, data/, db.ts (dev and tests)
+  test/         test setup and renderWithProviders
   proxy.ts      redirects signed-out users (Next 16's middleware)
 ```
 
@@ -48,6 +50,17 @@ Biome checks the two that matter most: no importing another feature's
 internals, and ui/lib/shared never import from features. Inside a feature,
 import files directly.
 
+## Mock backend
+
+With `API_MOCKING=enabled`, `app/api/mock` serves the MSW handlers over real
+HTTP and `API_URL` points at it, so the proxy, cookies and refresh flow all
+run for real. Nothing patches `fetch`, so it behaves the same in dev, in a
+production build and in a deployment. The app has
+no mock-specific code paths: turn it off and point `API_URL` at a real
+backend. Features never import `mocks/`; add a handler there for each new
+endpoint, mirroring the real API's envelope. The data is in memory and resets
+when the server restarts. Tests reuse the same handlers with `setupServer`.
+
 ## Where things live
 
 | What | Where |
@@ -60,6 +73,7 @@ import files directly.
 | Page paths, protected pages | `lib/routes.ts` |
 | HTTP setup (base URL, token, errors) | `lib/http/` |
 | Session cookies | `lib/session.ts`, names in `lib/cookies.ts` |
+| Mock endpoints and demo data | `mocks/handlers/`, `mocks/data/` |
 | Env variables | `lib/env.ts` (nothing else reads `process.env`) |
 | App name | `lib/site.ts` |
 | Colors and type | `theme/` |
