@@ -1,3 +1,4 @@
+import { customers } from "./data/customers";
 import { users } from "./data/users";
 
 interface AccessSession {
@@ -8,6 +9,7 @@ interface AccessSession {
 function createDb() {
   return {
     users: structuredClone(users),
+    customers: structuredClone(customers),
     accessTokens: new Map<string, AccessSession>(),
     refreshTokens: new Map<string, string>(),
   };
