@@ -1,4 +1,8 @@
-import { isServer, MutationCache, QueryClient } from "@tanstack/react-query";
+import {
+  environmentManager,
+  MutationCache,
+  QueryClient,
+} from "@tanstack/react-query";
 import { cache } from "react";
 import { ApiError } from "./http/errors";
 import { toast } from "./toast";
@@ -26,7 +30,7 @@ const getServerQueryClient = cache(makeQueryClient);
 let browserClient: QueryClient | undefined;
 
 export function getQueryClient() {
-  if (isServer) return getServerQueryClient();
+  if (environmentManager.isServer()) return getServerQueryClient();
   browserClient ??= makeQueryClient();
   return browserClient;
 }
