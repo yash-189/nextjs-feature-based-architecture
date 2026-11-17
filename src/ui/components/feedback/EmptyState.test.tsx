@@ -6,15 +6,15 @@ describe("EmptyState", () => {
   it("renders the title, description and action", () => {
     render(
       <EmptyState
-        title="No customers yet"
-        description="Add your first customer."
-        action={<button type="button">Add customer</button>}
+        title="No items yet"
+        description="Add your first item."
+        action={<button type="button">Add item</button>}
       />,
     );
-    expect(screen.getByText("No customers yet")).toBeInTheDocument();
-    expect(screen.getByText("Add your first customer.")).toBeInTheDocument();
+    expect(screen.getByText("No items yet")).toBeInTheDocument();
+    expect(screen.getByText("Add your first item.")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Add customer" }),
+      screen.getByRole("button", { name: "Add item" }),
     ).toBeInTheDocument();
   });
 
